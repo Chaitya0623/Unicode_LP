@@ -6,8 +6,81 @@ from django.db import models
 from django.contrib.auth.models import User
 
 from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import BaseUserManager
 
 # Create your models here.
+
+
+    
+class UserManager(BaseUserManager):
+
+    def create_user(self,email,password=None,is_active=True,is_staff=False,is_admin=False):
+
+        if not email:
+
+            raise ValueError("Users must have email")
+
+        
+
+        if not password:
+
+            raise ValueError("Users must have password")
+
+        user_obj=self.model(
+
+            email=self.normalize_email(email)
+
+        )
+
+        user_obj.staff=is_staff
+
+        user_obj.admin=is_admin
+
+        user_obj.active=is_active
+
+        user_obj.set_password(password)
+
+        user_obj.save(using=self._db)
+
+        return user_obj
+
+    
+
+    def create_staffuser(self,email,password=None):
+
+        user=self.create_user(
+
+            email,
+
+            password=password,
+
+            is_staff=True
+
+            )
+
+        return user
+
+    
+
+    def create_superuser(self,email,password=None):
+
+        user=self.create_user(
+
+            email,
+
+            password=password,
+
+            is_staff=True,
+
+            is_admin=True
+
+        )
+
+        return user
+
+
+
+
 class MyUser(AbstractBaseUser):
     email = models.EmailField(unique=True, max_length=255)
     # full_name = models.CharField(max_length=255, blank=True, null=True)
@@ -15,16 +88,22 @@ class MyUser(AbstractBaseUser):
     staff = models.BooleanField(default=False) #staff user non superuser
     admin = models.BooleanField(default=False) #superuser
     timestamp = models.DateTimeField(auto_now_add=True)
-    USERNAME_FIELD = 'email' #username
-    #email and password are required for default
 
+    USERNAME_FIELD = 'email' #username
+    REQUIRED_FIELDS=[]
+    objects=UserManager()
+    #email and password are required for default
     def __str__(self):
         return self.email
     def get_full_name(self):
         return self.email
     def get_short_name(self):
         return self.email
-
+    def has_perm(self,perm,obj=None):
+        return True
+    def has_module_perms(self,app_label):
+        return True
+        
     @property
     def is_staff(self):
         return self.staff
@@ -41,7 +120,7 @@ class User(models.Model):
     Married = models.BooleanField(blank=True)
     Birthday = models.DateTimeField()
     Image = models.ImageField(null=True, blank=True, upload_to='static/')
-    email = models.ForeignKey(MyUser, null=True, on_delete=models.SET_NULL)
+    email = models.ForeignKey(MyUser, null=True, on_delete=models.SET_NULL, blank=True)
 
     def __str__(self):
         return self.Name

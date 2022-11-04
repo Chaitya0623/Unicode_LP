@@ -1,0 +1,23 @@
+{
+	"folders": [
+		{
+			"path": "../../../Java"
+		},
+		{
+			"path": "../.."
+		},
+		{
+			"path": "../../../Interview Tasks/Unicode Tasks/Covid19_Tracker"
+		},
+		{
+			"path": "../../../Interview Tasks/Unicode Tasks/react_quiz"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"conio.h": "c",
+			"stdio.h": "c"
+		},
+		"liveServer.settings.multiRootWorkspaceName": "DJ Unicode"
+	}
+}
